@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 RUN npm install
-RUN npm install react-icons next-themes
+RUN npm install react-icons next-themes @radix-ui/react-dialog @radix-ui/react-icons class-variance-authority
 
 # Rebuild the source code only when needed
 FROM base AS builder

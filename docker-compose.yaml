@@ -10,14 +10,17 @@ services:
       timeout: 30s
       retries: 3
       start_period: 30s
-    ports:
-      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
       - HOSTNAME=0.0.0.0
     networks:
       - coolify
+    labels:
+      traefik.enable: true
+      traefik.http.routers.${COOLIFY_SERVICE_ID}.rule: Host(`${COOLIFY_DOMAIN}`)
+      traefik.http.services.${COOLIFY_SERVICE_ID}.loadbalancer.server.port: 3000
+      coolify.managed: "true"
 
 networks:
   coolify:

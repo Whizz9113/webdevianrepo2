@@ -24,7 +24,7 @@ export async function POST(req: Request) {
           <p><strong>Nachricht:</strong></p>
           <p>${message}</p>
         `,
-        replyTo: email,
+        reply_To: email,
       });
 
       if (error) {

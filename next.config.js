@@ -4,7 +4,7 @@ const nextConfig = {
   swcMinify: true,
   output: 'standalone',
   basePath: '',
-  assetPrefix: 'https://webdevian.ch', // Ihre vollständige Domain
+  assetPrefix: process.env.COOLIFY_URL || 'https://webdevian.ch',
   poweredByHeader: false,
   transpilePackages: ['framer-motion']
 }

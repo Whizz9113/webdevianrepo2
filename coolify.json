@@ -1,0 +1,15 @@
+{
+  "buildConfig": {
+    "type": "node",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "installCommand": "npm install"
+  },
+  "staticConfig": {
+    "directory": ".next"
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  }
+}

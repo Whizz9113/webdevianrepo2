@@ -9,6 +9,7 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 RUN npm install
+RUN npm install react-icons next-themes
 
 # Rebuild the source code only when needed
 FROM base AS builder

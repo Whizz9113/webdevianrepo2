@@ -1,15 +1,6 @@
+// src/app/api/health/route.ts
+import { NextResponse } from 'next/server';
+
 export async function GET() {
-  return new Response(
-    JSON.stringify({ 
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0'
-    }), 
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-} 
+  return NextResponse.json({ status: 'healthy' }, { status: 200 });
+}

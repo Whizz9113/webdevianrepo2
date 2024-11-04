@@ -1,41 +1,39 @@
-FROM node:18-alpine AS base
+FROM node:18-alpine
 
-# Install dependencies only when needed
-FROM base AS deps
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json ./
-RUN npm ci
+# Systemabhängigkeiten
+RUN apk add --no-cache libc6-compat python3 make g++
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Package-Dateien kopieren
+COPY package*.json ./
+
+# Dependencies installieren
+RUN npm install
+
+# Quellcode kopieren
 COPY . .
 
-# Disable telemetry during the build
-ENV NEXT_TELEMETRY_DISABLED 1
+# Toast-Komponenten entfernen
+RUN rm -f src/components/ui/toast.tsx \
+    src/components/ui/toaster.tsx \
+    src/components/ui/use-toast.ts \
+    src/components/ui/use-toast.tsx
 
+# Entferne oder kommentiere Toast-Imports in Layout aus
+RUN if [ -f src/app/layout.tsx ]; then \
+    sed -i 's/import.*Toaster.*//g' src/app/layout.tsx && \
+    sed -i 's/<Toaster.*\/>//g' src/app/layout.tsx; \
+    fi
+
+# Build
+ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
+# Port und Environment
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
-ENV PORT 3000
 
-CMD ["node", "server.js"]
+# Start
+CMD ["npm", "start"]

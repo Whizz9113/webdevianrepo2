@@ -1,36 +1,25 @@
-# Build-Stage
-FROM node:18-alpine AS build
+FROM ghcr.io/railwayapp/nixpacks:ubuntu-1725321821
 
-WORKDIR /app
+WORKDIR /app/
 
-# Kopiere package.json und package-lock.json
-COPY package*.json ./
+COPY .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix
 
-# Installiere Abhängigkeiten
-RUN npm install
+RUN nix-env -if .nixpacks/nixpkgs-e05605ec414618eab4a7a6aea8b38f6fbbcc8f08.nix && nix-collect-garbage -d
 
-# Kopiere den Rest der Anwendung
-COPY . .
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
 
-# Baue die Anwendung
-RUN npm run build
+# dependencies phase
+COPY package*.json /app/
+RUN --mount=type=cache,id=d0k00skck8g84kg0040s4ks0-/root/npm,target=/root/.npm npm install --legacy-peer-deps
+RUN npm install react-icons next-themes
 
-# Production-Stage
-FROM nginx:alpine
+# build phase
+COPY . /app/.
+RUN --mount=type=cache,id=d0k00skck8g84kg0040s4ks0-next/cache,target=/app/.next/cache --mount=type=cache,id=d0k00skck8g84kg0040s4ks0-node_modules/cache,target=/app/node_modules/.cache npm run build
 
-WORKDIR /usr/share/nginx/html/
-
-# Kopiere die gebaute Anwendung
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-# Kopiere nginx Konfiguration
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-
-# Exponiere Port 80
+# production phase
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
 
-# Starte nginx
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

@@ -6,12 +6,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Installation der Dependencies
-RUN npm ci
+RUN npm install --legacy-peer-deps
+RUN npm install @radix-ui/react-dialog @radix-ui/react-icons @radix-ui/react-slot tailwindcss-animate class-variance-authority clsx tailwind-merge --legacy-peer-deps
 
-# Installation der zusätzlichen Dependencies (falls nötig)
-RUN npm install @radix-ui/react-dialog @radix-ui/react-icons @radix-ui/react-slot class-variance-authority clsx tailwind-merge lucide-react --legacy-peer-deps
-
-# Kopieren des restlichen Projektcodes
+# Kopieren des Projektcodes
 COPY . .
 
 # Build der Anwendung

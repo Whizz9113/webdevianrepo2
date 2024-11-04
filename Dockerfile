@@ -1,22 +1,28 @@
-FROM ghcr.io/railwayapp/nixpacks:ubuntu-1725321821
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Kopieren der package.json und package-lock.json
+# Install build dependencies
+RUN apk add --no-cache libc6-compat python3 make g++
+
+# Copy package files
 COPY package*.json ./
 
-# Installation der Dependencies
-RUN npm install --legacy-peer-deps
-RUN npm install @radix-ui/react-dialog @radix-ui/react-icons @radix-ui/react-slot tailwindcss-animate class-variance-authority clsx tailwind-merge --legacy-peer-deps
+# Install all dependencies
+RUN npm ci
+RUN npm install @radix-ui/react-dialog @radix-ui/react-toast @radix-ui/react-icons @radix-ui/react-slot @radix-ui/react-dropdown-menu \
+    class-variance-authority clsx tailwind-merge lucide-react \
+    --legacy-peer-deps
 
-# Kopieren des Projektcodes
+# Copy the rest of the application
 COPY . .
 
-# Build der Anwendung
+# Build the application
 RUN npm run build
 
 ENV NODE_ENV=production
 ENV PORT=3000
+
 EXPOSE 3000
 
 CMD ["npm", "start"]

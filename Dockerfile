@@ -5,8 +5,9 @@ WORKDIR /app
 # Kopieren der Package-Dateien
 COPY package.json package-lock.json ./
 
-# Installation der Dependencies
+# Installation ALLER Dependencies
 RUN npm install --legacy-peer-deps
+RUN npm install @radix-ui/react-dialog @radix-ui/react-icons class-variance-authority --legacy-peer-deps
 
 # Kopieren des restlichen Projektcodes
 COPY . .
